@@ -1,8 +1,8 @@
 {
   "editor.formatOnSave": true,
-    "python.analysis.extraPaths": [
-        "${workspaceFolder}/src"
-      ],
+    // "python.analysis.extraPaths": [
+    //     "${workspaceFolder}/src"
+    //   ],
     "[python]": {
         "editor.defaultFormatter": "charliermarsh.ruff",
         "editor.codeActionsOnSave": {
