@@ -1,23 +1,31 @@
-from app.config.db import SqlAlchemyUnitOfWork
-from app.dao.example import ExampleDAO
+from datetime import datetime
+
 from app.dto.example import ExampleCreateDTO, ExampleDTO
 
 
 class ExampleService:
     """
     Сервисный слой для работы с примерами.
-    Содержит бизнес-логику и использует DAO для работы с БД.
+    Использует хранилище в памяти для демонстрации.
     """
 
-    @staticmethod
-    async def create(data: ExampleCreateDTO) -> ExampleDTO:
-        async with SqlAlchemyUnitOfWork() as uow:
-            example = await ExampleDAO.create(uow.session, data)
-            await uow.commit()
-            return example
+    _examples: dict[int, dict] = {}
+    _next_id: int = 1
 
-    @staticmethod
-    async def get_all() -> list[ExampleDTO]:
-        async with SqlAlchemyUnitOfWork() as uow:
-            examples = await ExampleDAO.get_all(uow.session)
-            return examples
+    @classmethod
+    async def create(cls, data: ExampleCreateDTO) -> ExampleDTO:
+        """Создает новую запись в хранилище в памяти."""
+        new_id = cls._next_id
+        new_example_data = {
+            "id": new_id,
+            "name": data.name,
+            "created_at": datetime.utcnow(),
+        }
+        cls._examples[new_id] = new_example_data
+        cls._next_id += 1
+        return ExampleDTO(**new_example_data)
+
+    @classmethod
+    async def get_all(cls) -> list[ExampleDTO]:
+        """Возвращает все записи из хранилища в памяти."""
+        return [ExampleDTO(**e) for e in cls._examples.values()]
